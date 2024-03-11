@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,23 +15,27 @@ func main() {
 	mux.HandleFunc("GET /blog/", BlogHandler)
 	mux.HandleFunc("GET /blog/{id}/", BlogByIdHandler)
 
-	http.Handle("/static", http.FileServer(http.Dir("./static/")))
+	mux.Handle("GET /static/", http.StripPrefix("/static", http.FileServer(http.Dir("./static/"))))
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
+
 }
 
 func AboutHandler(w http.ResponseWriter, r *http.Request) {
 
-	t, _ := template.ParseFiles("./template/about.gohtml")
+	t, _ := template.ParseFiles("./template/index.gohtml", "./template/about.gohtml")
 
-	t.Execute(w, nil)
+	err := t.ExecuteTemplate(w, "index", nil)
 
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func BlogHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("./template/blog.gohtml")
+	t, _ := template.ParseFiles("./template/blog.gohtml", "./template/index.html")
 
-	t.Execute(w, nil)
+	log.Fatal(t.Execute(w, nil))
 }
 
 func BlogByIdHandler(w http.ResponseWriter, r *http.Request) {
