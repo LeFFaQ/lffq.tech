@@ -1,3 +1,7 @@
 {{define "content"}}
-
+{{range $key, $value := .}}
+        <h1><a href="/{{$key}}">{{$value.Title}}</a></h1>
+        <p>{{$value.Desc}}</p>
+        <hr>
+{{end}}
 {{end}}
